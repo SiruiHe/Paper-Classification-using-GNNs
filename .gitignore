@@ -1,1 +1,3 @@
-**/*.csv
+construct_dataset/crawler_data/**
+
+construct_dataset/dataset/sorted_papers.csv
