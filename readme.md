@@ -7,10 +7,7 @@ This project implements a custom graph dataset similar to ogbn-arxiv, along with
 
 ## Setup Instructions
 1. Place your `node_features.csv` file in `construct_dataset/raw/` directory
-2. Run dataset construction
-    ```bash
-    python construct_dataset/create_dataset.py
-    ```
+
 
 ## Training
 Currently implemented models:
@@ -21,7 +18,6 @@ To train the model:
 ```bash
 python train.py
 ```
-
 
 ## TODO
 - Implement additional GNN architectures
