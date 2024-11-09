@@ -1,6 +1,6 @@
 construct_dataset/crawler_data/**
 construct_dataset/raw/sorted_papers.csv
-construct_dataset/raw/node_features.csv
+construct_dataset/raw/node_features.*
 construct_dataset/processed/**
 logs/**
 checkpoints/**
