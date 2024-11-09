@@ -14,8 +14,8 @@ from threading import Lock
 start_index = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 
 # 读取文件
-input_file = 'processed_with_doi.csv'
-output_file = 'processed_with_references.csv'
+input_file = 'crawler_data/processed_with_doi.csv'
+output_file = 'crawler_data/processed_with_references.csv'
 
 df = pd.read_csv(input_file)
 

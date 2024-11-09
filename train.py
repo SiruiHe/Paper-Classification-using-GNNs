@@ -1,0 +1,58 @@
+import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from models.baseline import GCNBaseline
+from construct_dataset.create_dataset import CustomArxivDataset
+from torch_geometric.loader import DataLoader
+
+def main():
+    # 加载数据集
+    dataset = CustomArxivDataset(root='dataset/')
+    data = dataset[0]
+    
+    # 创建模型
+    model = GCNBaseline(
+        in_channels=data.x.size(1),  # 输入特征维度
+        hidden_channels=256,         # 隐藏层维度
+        out_channels=dataset.num_classes,  # 输出类别数
+        num_layers=3,               # GCN层数
+        dropout=0.5                 # dropout率
+    )
+    
+    # 设置回调函数
+    callbacks = [
+        ModelCheckpoint(
+            monitor='val_acc',
+            dirpath='checkpoints',
+            filename='gcn-{epoch:02d}-{val_acc:.2f}',
+            save_top_k=3,
+            mode='max'
+        ),
+        EarlyStopping(
+            monitor='val_acc',
+            patience=10,
+            mode='max'
+        )
+    ]
+    
+    # 创建训练器
+    trainer = pl.Trainer(
+        max_epochs=200,
+        accelerator='auto',  # 自动选择GPU或CPU
+        devices=1,
+        callbacks=callbacks,
+        default_root_dir='logs'
+    )
+    
+    # 创建数据加载器
+    train_loader = DataLoader([data], batch_size=1)
+    val_loader = DataLoader([data], batch_size=1)
+    test_loader = DataLoader([data], batch_size=1)
+    
+    # 训练模型
+    trainer.fit(model, train_loader, val_loader)
+    
+    # 测试模型
+    trainer.test(model, test_loader)
+
+if __name__ == '__main__':
+    main()

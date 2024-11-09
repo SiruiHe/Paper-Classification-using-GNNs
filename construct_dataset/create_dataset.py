@@ -65,15 +65,13 @@ class CustomArxivDataset(Dataset):
         # 转换标签
         y = torch.tensor(labels_df['label'].values, dtype=torch.long)
         
-        # 创建训练/验证/测试掩码
-        num_nodes = x.size(0)
-        # 随机划分数据集 (可以根据需要调整比例)
-        indices = torch.randperm(num_nodes)
-        train_idx = indices[:int(0.8 * num_nodes)]
-        val_idx = indices[int(0.8 * num_nodes):int(0.9 * num_nodes)]
-        test_idx = indices[int(0.9 * num_nodes):]
+        # 读取预先划分的训练/验证/测试集索引
+        train_idx = np.load(osp.join(self.raw_dir, 'train_idx.npy'))
+        val_idx = np.load(osp.join(self.raw_dir, 'valid_idx.npy'))
+        test_idx = np.load(osp.join(self.raw_dir, 'test_idx.npy'))
         
         # 创建掩码
+        num_nodes = x.size(0)
         train_mask = torch.zeros(num_nodes, dtype=torch.bool)
         val_mask = torch.zeros(num_nodes, dtype=torch.bool)
         test_mask = torch.zeros(num_nodes, dtype=torch.bool)
