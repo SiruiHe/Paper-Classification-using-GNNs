@@ -6,7 +6,7 @@ from torch_geometric.loader import DataLoader
 
 def main():
     # 加载数据集
-    dataset = CustomArxivDataset(root='dataset/')
+    dataset = CustomArxivDataset(root='construct_dataset/')
     data = dataset[0]
     
     # 创建模型
