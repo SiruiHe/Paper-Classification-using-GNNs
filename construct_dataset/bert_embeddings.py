@@ -59,7 +59,7 @@ def main():
     
     # 读取数据
     print("Loading data...")
-    sorted_df = pd.read_csv('sorted_papers.csv')
+    sorted_df = pd.read_csv('raw/sorted_papers.csv')
     
     # 测试前三个样本
     print("\n=== Testing first three samples ===")
@@ -86,7 +86,7 @@ def main():
     features_df.columns = [f'feature{i+1}' for i in range(features.shape[1])]
     
     print(f"Feature matrix shape: {features.shape}")
-    features_df.to_csv('node_features.csv', index=False)
+    features_df.to_csv('raw/node_features.csv', index=False)
     print("Features saved to node_features.csv")
 
 if __name__ == '__main__':

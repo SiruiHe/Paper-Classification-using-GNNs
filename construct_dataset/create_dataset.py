@@ -7,20 +7,20 @@ import os.path as osp
 
 '''
 # Requirements:
-# edges.csv 格式:
+# edges.csv format:
 source,target
 0,1
 0,2
 1,2
 ...
 
-# node_features.csv 格式:
+# node_features.csv format:
 feature1,feature2,feature3,...
 0.1,0.2,0.3,...
 0.2,0.3,0.4,...
 ...
 
-# node_labels.csv 格式:
+# node_labels.csv format:
 label
 0
 1
@@ -41,7 +41,8 @@ class CustomArxivDataset(Dataset):
     @property
     def raw_file_names(self):
         # 列出所有原始CSV文件
-        return ['edges.csv', 'node_features.csv', 'node_labels.csv']
+        # return ['edges.csv', 'node_features_strict.csv', 'node_labels.csv']
+        return ['edges.csv', 'node_features_w2v.csv', 'node_labels.csv']
     
     @property
     def processed_file_names(self):
@@ -50,7 +51,8 @@ class CustomArxivDataset(Dataset):
     def process(self):
         # 读取CSV文件
         edges_df = pd.read_csv(osp.join(self.raw_dir, 'edges.csv'))
-        features_df = pd.read_csv(osp.join(self.raw_dir, 'node_features.csv'))
+        # features_df = pd.read_csv(osp.join(self.raw_dir, 'node_features_strict.csv'))
+        features_df = pd.read_csv(osp.join(self.raw_dir, 'node_features_w2v.csv'))
         labels_df = pd.read_csv(osp.join(self.raw_dir, 'node_labels.csv'))
         
         # 转换边信息为COO格式

@@ -39,8 +39,8 @@ def reduce_dimensions(input_file, output_file, n_components=128):
     return data_reduced, explained_variance
 
 if __name__ == "__main__":
-    input_file = "./construct_dataset/raw/node_features.csv"  # Replace with your input file path
-    output_file = "reduced_features.csv"
+    input_file = "./construct_dataset/raw/node_features_subseq.csv"  # Replace with your input file path
+    output_file = "./construct_dataset/raw/reduced_features.csv"
     
     reduced_data, variance = reduce_dimensions(input_file, output_file)
     print(f"Dimensionality reduction complete. Output saved to {output_file}")
