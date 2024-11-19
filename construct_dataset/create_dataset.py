@@ -42,7 +42,7 @@ class CustomArxivDataset(Dataset):
     def raw_file_names(self):
         # 列出所有原始CSV文件
         # return ['edges.csv', 'node_features_strict.csv', 'node_labels.csv']
-        return ['edges.csv', 'node_features_w2v.csv', 'node_labels.csv']
+        return ['edges.csv', 'reduced_features_strict.csv', 'node_labels.csv']
     
     @property
     def processed_file_names(self):
@@ -52,7 +52,7 @@ class CustomArxivDataset(Dataset):
         # 读取CSV文件
         edges_df = pd.read_csv(osp.join(self.raw_dir, 'edges.csv'))
         # features_df = pd.read_csv(osp.join(self.raw_dir, 'node_features_strict.csv'))
-        features_df = pd.read_csv(osp.join(self.raw_dir, 'node_features_w2v.csv'))
+        features_df = pd.read_csv(osp.join(self.raw_dir, 'reduced_features_strict.csv'))
         labels_df = pd.read_csv(osp.join(self.raw_dir, 'node_labels.csv'))
         
         # 转换边信息为COO格式

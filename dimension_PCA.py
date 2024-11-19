@@ -39,8 +39,11 @@ def reduce_dimensions(input_file, output_file, n_components=128):
     return data_reduced, explained_variance
 
 if __name__ == "__main__":
-    input_file = "./construct_dataset/raw/node_features_subseq.csv"  # Replace with your input file path
-    output_file = "./construct_dataset/raw/reduced_features.csv"
+    dataset_type = "_strict"  # Options: "_strict", "_coarse", "_subseq"
+    
+    # Construct file paths based on the dataset type
+    input_file = f"./construct_dataset/raw/node_features{dataset_type}.csv"
+    output_file = f"./construct_dataset/raw/reduced_features{dataset_type}.csv"
     
     reduced_data, variance = reduce_dimensions(input_file, output_file)
     print(f"Dimensionality reduction complete. Output saved to {output_file}")

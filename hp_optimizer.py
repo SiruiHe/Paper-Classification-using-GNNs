@@ -2,7 +2,7 @@ import optuna
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from torch_geometric.loader import DataLoader
-from models.baseline import GCNBaseline
+from GNN_Project.my_models import GCNBaseline
 from construct_dataset.create_dataset import CustomArxivDataset
 import torch
 import multiprocessing as mp

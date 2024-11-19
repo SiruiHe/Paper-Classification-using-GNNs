@@ -67,6 +67,9 @@ def main():
     print("加载论文数据...")
     sorted_df = pd.read_csv('raw/sorted_papers.csv')
     
+    # 选择数据集后缀
+    dataset_suffix = "_strict"  # 可选: "_strict", "_subseq", "_coarse"
+    
     # 训练Word2Vec模型
     word_vectors = train_word2vec(sorted_df)
     print(f"词向量维度: {word_vectors.vector_size}")
@@ -90,8 +93,8 @@ def main():
     features_df.columns = [f'feature{i+1}' for i in range(features.shape[1])]
     
     print(f"特征矩阵形状: {features.shape}")
-    features_df.to_csv('raw/node_features_w2v.csv', index=False)
-    print("特征已保存到 node_features.csv")
+    features_df.to_csv(f'raw/w2v_features{dataset_suffix}.csv', index=False)
+    print(f"特征已保存到 w2v_features{dataset_suffix}.csv")
 
 if __name__ == '__main__':
     main()

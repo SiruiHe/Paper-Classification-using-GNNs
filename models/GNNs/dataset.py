@@ -128,7 +128,7 @@ def load_arxiv_dataset(data_dir, name, split_method, embeddings):
     if embeddings == "scibert":
         file_name = "reduced_features_strict.csv"
     elif embeddings == "word2vec":
-        file_name = "node_features_w2v_strict.csv"
+        file_name = "w2v_features_strict.csv"
     else:
         raise ValueError('Error: no embeddings')
     feat_file_path = f'{data_dir}{file_name}'

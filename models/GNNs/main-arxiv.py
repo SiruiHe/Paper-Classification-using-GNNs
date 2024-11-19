@@ -3,6 +3,7 @@ import random
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
+import gc
 from torch_geometric.utils import to_undirected, remove_self_loops, add_self_loops
 
 from lg_parse import parse_method, parser_add_main_args
@@ -13,6 +14,7 @@ from data_utils import eval_acc
 from eval import *
 
 
+
 def fix_seed(seed=42):
     random.seed(seed)
     np.random.seed(seed)
@@ -21,6 +23,11 @@ def fix_seed(seed=42):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+    
+import os
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
+# torch.cuda.set_per_process_memory_fraction(0.9)¬
+torch.cuda.empty_cache()
 
 ### Parse args ###
 parser = argparse.ArgumentParser(description='Training Pipeline for Node Classification')
@@ -110,6 +117,10 @@ for run in range(args.runs):
                   f'Test: {100 * result[2]:.2f}%, '
                   f'Best Valid: {100 * best_val:.2f}%, '
                   f'Best Test: {100 * best_test:.2f}%')
+
+        gc.collect()
+        torch.cuda.empty_cache()
+
     logger.print_statistics(run)
 
 results = logger.print_statistics()

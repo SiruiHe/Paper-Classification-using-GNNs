@@ -32,9 +32,9 @@ Please refer to run_models.ipynb
 
 ```bash
 # GCN + scibert&pca
-python main-arxiv.py --dataset arxiv-physics --hidden_channels 512 --epochs 500 --lr 0.0005 --runs 2 --local_layers 5 --embeddings scibert --bn --device 0 --res 
+python main-arxiv.py --dataset arxiv-physics --hidden_channels 256 --epochs 500 --lr 0.0005 --runs 2 --local_layers 5 --embeddings scibert --bn --device 0 --res 
 # GCN + word2vec&skip-gram
-python main-arxiv.py --dataset arxiv-physics --hidden_channels 512 --epochs 500 --lr 0.0005 --runs 2 --local_layers 5 --embeddings word2vec --bn --device 0 --res 
+python main-arxiv.py --dataset arxiv-physics --hidden_channels 256 --epochs 500 --lr 0.0005 --runs 2 --local_layers 5 --embeddings word2vec --bn --device 0 --res 
 
 # SAGE + scibert&pca
 python main-arxiv.py --dataset arxiv-physics --hidden_channels 256 --epochs 500 --lr 0.0005 --runs 2 --local_layers 4 --embeddings scibert --bn --device 0 --res --sage
