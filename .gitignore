@@ -1,7 +1,10 @@
 construct_dataset/crawler_data/**
 construct_dataset/raw/**
 construct_dataset/processed/**
+dataset/processed/**
+dataset/raw/**
 checkpoints/**
+lightning_logs/**
 **/__pycache__/
 models/GNNs/data/**
 models/GNNs/results/**

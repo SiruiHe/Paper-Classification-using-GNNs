@@ -1,42 +1,79 @@
-# Graph Machine Learning Project (CS 5284)
+# CS5284 Graph Machine Learning Project
 
-This project implements a custom graph dataset similar to ogbn-arxiv, along with GNN models for node classification.
+This project implements various GNN architectures for paper classification on a custom ogbn-arxiv-like dataset.
 
-> **Current version of data has some issues. Need to reconstruct the dataset using the new crawler data!**
+## Project Structure
+```
+GNN_Project/
+├── dataset/
+│   ├── raw/                    # Raw data files
+│   │   ├── edges.csv          # Paper citation network
+│   │   ├── reduced_features_strict.csv  # SciBERT embeddings
+│   │   ├── w2v_features_strict.csv      # Word2Vec embeddings
+│   │   └── node_labels.csv    # Paper category labels
+│   └── create_dataset.py      # Dataset loader implementation
+├── my_models.py               # GNN model implementations
+└── train.py                   # Training pipeline
+```
 
 
-## Setup Instructions
-1. Prepare node features in either way:
-   - Generate your own text embeddings using your preferred method
-   - Use the pre-generated SciBERT embeddings as node features
-2. Place the `node_features.csv` file in `construct_dataset/raw/` directory
+## Important: Data Preparation
+Before running any experiments, make sure to:
+1. Create the `dataset/raw/` directory if it doesn't exist
+2. Place all required data files in the `dataset/raw/` directory:
+   - `edges.csv`: Source and target node pairs for citations
+   - `reduced_features_strict.csv`: SciBERT + PCA embeddings (128 dim)
+   - `w2v_features_strict.csv`: Word2Vec embeddings (128 dim)
+   - `node_labels.csv`: Paper category labels
+   - `train_idx.npy`, `valid_idx.npy`, `test_idx.npy`: Data splits
 
-### Optional: Build the dataset from scratch
-1. Create a `crawler_data` directory under `construct_dataset/`
-2. Place the following files in the `crawler_data` directory:
-   - `processed_with_references.csv`
-   - `processed_with_doi.csv`
-
-
-## Training
+## Models
 Currently implemented models:
-- GCN (Baseline)
+- MLP (Baseline)
+- GCN (Graph Convolutional Network)
+- GAT (Graph Attention Network)
+- GraphSAGE
 
-To train the model:
+Each model supports:
+- Different preprocessing methods ('basic' and 'arxiv-specific')
+- Multiple embedding options (SciBERT and Word2Vec)
+- Early stopping and model checkpointing
 
+## Usage
+
+### Training from Python
+```python
+from train import train_gnn_model
+
+# Train GCN with SciBERT embeddings
+results = train_gnn_model(
+    model_type='gcn',           # Options: 'mlp', 'gcn', 'gat', 'sage'
+    preprocess_mode='compare',  # Options: 'compare', 'basic', 'arxiv'
+    embedding_type='scibert'    # Options: 'scibert', 'word2vec'
+)
+```
+
+### Training from Command Line
 ```bash
 python train.py
 ```
 
-## TODO
-- Implement additional GNN architectures
-- Add model evaluation metrics
-- Add visualization and more detailed EDA
-
 ## Dataset Format
-- `edges.csv`: Source and target node pairs
-- `node_features.csv`: Node feature vectors
-- `node_labels.csv`: Node classification labels
+The dataset loader (`CustomArxivDataset`) expects the following files in `dataset/raw/`:
+- `edges.csv`: Source and target node pairs for citations
+- `reduced_features_strict.csv`: SciBERT + PCA embeddings (128 dim)
+- `w2v_features_strict.csv`: Word2Vec embeddings (128 dim)
+- `node_labels.csv`: Paper category labels
+- `train_idx.npy`, `valid_idx.npy`, `test_idx.npy`: Data splits
 
-## Notes
-This project is part of CS 5284 Graph Machine Learning course assignment. The dataset structure follows the format of ogbn-arxiv but with our custom data.
+## Results
+Training results are automatically saved to:
+- `results/`: JSON files containing model configurations and performance metrics
+- `checkpoints/`: Model checkpoints (best validation performance)
+
+## Dependencies
+- PyTorch
+- PyTorch Geometric
+- PyTorch Lightning
+- pandas
+- numpy
