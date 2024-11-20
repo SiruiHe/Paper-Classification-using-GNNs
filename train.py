@@ -4,8 +4,10 @@ from my_models import *
 from dataset.create_dataset import CustomArxivDataset
 from torch_geometric.loader import DataLoader
 import json
+import matplotlib.pyplot as plt
 import os
 from datetime import datetime
+import warnings
 
 class CustomProgressBar(pl.callbacks.ProgressBar):
     def __init__(self):
@@ -31,7 +33,50 @@ class CustomProgressBar(pl.callbacks.ProgressBar):
               f"Valid: {val_acc:.2%}, Test: {test_acc:.2%}, "
               f"Best Valid: {best_val:.2%}, Best Test: {best_test:.2%}")
 
-
+def plot_accuracy_curves(train_accs, val_accs, model_type, preprocess_mode=None):
+    """Plot training and validation accuracy curves"""
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_accs, label='Training Accuracy')
+    plt.plot(val_accs, label='Validation Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.title(f'Accuracy Curves for {model_type.upper()}' + 
+             (f' ({preprocess_mode} preprocessing)' if preprocess_mode else ''))
+    plt.legend()
+    plt.grid(True)
+    
+    # Create accuracy directory if it doesn't exist
+    os.makedirs('accuracy', exist_ok=True)
+    
+    # Save the plot
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f'accuracy/{model_type}_{preprocess_mode}_{timestamp}.png'
+    plt.savefig(filename)
+    plt.close()
+    print(f"\nAccuracy curves saved to {filename}")
+    
+def plot_loss_curves(train_losses, val_losses, model_type, preprocess_mode=None):
+    """Plot training and validation loss curves"""
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_losses, label='Training Loss')
+    plt.plot(val_losses, label='Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title(f'Loss Curves for {model_type.upper()}' + 
+             (f' ({preprocess_mode} preprocessing)' if preprocess_mode else ''))
+    plt.legend()
+    plt.grid(True)
+    
+    # Create loss directory if it doesn't exist
+    os.makedirs('loss', exist_ok=True)
+    
+    # Save the plot
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f'loss/{model_type}_{preprocess_mode}_{timestamp}.png'
+    plt.savefig(filename)
+    plt.close()
+    print(f"\nLoss curves saved to {filename}")
+    
 def create_model(model_type, data, dataset, preprocess_mode='basic'):
     """Create model instance based on model type"""
     model_params = {}
@@ -102,10 +147,69 @@ def create_model(model_type, data, dataset, preprocess_mode='basic'):
 def train_and_evaluate(model, train_loader, val_loader, test_loader, model_type, preprocess_mode=None):
     """Helper function to train and evaluate a model with specific configuration"""
     
+    warnings.filterwarnings('ignore')
+    
+    print("\nDetailed Model Summary:")
+    print("-" * 80)
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    
+    print(f"{'Layer':<40} {'Output Shape':<20} {'Param #':<10}")
+    print("-" * 80)
+    for name, param in model.named_parameters():
+        print(f"{name:<40} {str(list(param.shape)):<20} {param.numel():<10}")
+    
+    print("-" * 80)
+    print(f"Total trainable parameters: {trainable_params:,}")
+    print(f"Total parameters: {total_params:,}")
+    print("-" * 80)
+    
     # Create unique experiment name
     experiment_name = f"{model_type}"
     if preprocess_mode:
         experiment_name += f"_{preprocess_mode}"
+        
+    class LossTracker(pl.Callback):
+        def __init__(self):
+            super().__init__()
+            self.train_losses = []
+            self.val_losses = []
+            self.train_accs = []
+            self.val_accs = []
+            self.best_epoch = 0
+            self.best_val_acc = 0
+                
+        def on_train_epoch_end(self, trainer, pl_module):
+            # Record losses at the end of each epoch
+            train_loss = float(pl_module.current_loss)
+            val_loss = float(trainer.callback_metrics.get("val_loss", 0))
+            train_acc = float(trainer.callback_metrics.get("train_acc", 0))
+            val_acc = float(trainer.callback_metrics.get("val_acc", 0))
+            
+            self.train_losses.append(train_loss)
+            self.val_losses.append(val_loss)
+            self.train_accs.append(train_acc)
+            self.val_accs.append(val_acc)
+            
+            # Track best validation accuracy
+            if val_acc > self.best_val_acc:
+                self.best_val_acc = val_acc
+                self.best_epoch = trainer.current_epoch
+        
+        def on_train_end(self, trainer, pl_module):
+            # Plot curves at the end of training
+            if len(self.train_losses) > 0:
+                plot_loss_curves(self.train_losses, self.val_losses, 
+                            model_type, preprocess_mode)
+                plot_accuracy_curves(self.train_accs, self.val_accs,
+                                model_type, preprocess_mode)
+                
+                # Print best metrics
+                print(f"\nBest Validation Metrics (Epoch {self.best_epoch + 1}):")
+                print(f"  Train Loss: {self.train_losses[self.best_epoch]:.4f}")
+                print(f"  Valid Loss: {self.val_losses[self.best_epoch]:.4f}")
+                print(f"  Train Accuracy: {self.train_accs[self.best_epoch]:.2%}")
+                print(f"  Valid Accuracy: {self.val_accs[self.best_epoch]:.2%}")
     
     # Set up callbacks
     callbacks = [
@@ -121,19 +225,21 @@ def train_and_evaluate(model, train_loader, val_loader, test_loader, model_type,
         ),
         EarlyStopping(
             monitor='val_acc',
-            patience=100,
+            patience=50,
             mode='max'
         ),
-        CustomProgressBar()  # Add custom progress bar
+        CustomProgressBar(),
+        LossTracker()  # Add loss tracker
     ]
     
     # Create trainer
     trainer = pl.Trainer(
-        max_epochs=1000,
+        max_epochs=500,
         accelerator='auto',
         devices=1,
         callbacks=callbacks,
         enable_progress_bar=True,
+        enable_model_summary=True,
         # logger=False
     )
     
@@ -243,11 +349,11 @@ def train_gnn_model(model_type='gcn', preprocess_mode='compare', embedding_type=
 if __name__ == '__main__':
     # Example usage:
     # train_gnn_model(model_type='mlp', embedding_type='word2vec')  # Run MLP baseline
-    # train_gnn_model(model_type='gcn', preprocess_mode='compare')  # Compare preprocessing methods
+    train_gnn_model(model_type='gcn', preprocess_mode='basic')  # Compare preprocessing methods
     # train_gnn_model(model_type='gat', preprocess_mode='basic')  # Use basic preprocessing
     # train_gnn_model(model_type='sage', preprocess_mode='arxiv')  # Use arxiv preprocessing
     
     # train_gnn_model(model_type='sage', preprocess_mode='compare', embedding_type='word2vec')
     # train_gnn_model(model_type='mlp', preprocess_mode='compare', embedding_type='word2vec')
-    train_gnn_model(model_type='gat_dgl', preprocess_mode='basic', embedding_type='word2vec') 
+    # train_gnn_model(model_type='gat_dgl', preprocess_mode='basic', embedding_type='word2vec') 
     

@@ -9,3 +9,6 @@ lightning_logs/**
 **/__pycache__/
 models/GNNs/data/**
 models/GNNs/results/**
+loss/**
+accuracy/**
+results/**

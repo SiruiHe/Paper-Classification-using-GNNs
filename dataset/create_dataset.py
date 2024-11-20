@@ -74,7 +74,9 @@ class CustomArxivDataset(Dataset):
         test_idx = np.load(osp.join(self.raw_dir, 'test_idx.npy'))
         
         # Convert to PyG format
-        edge_index = torch.tensor([edges_df['source'].values, edges_df['target'].values], dtype=torch.long)
+        edge_array = np.array([edges_df['source'].values, edges_df['target'].values])
+        edge_index = torch.tensor(edge_array, dtype=torch.long)
+        # edge_index = torch.tensor([edges_df['source'].values, edges_df['target'].values], dtype=torch.long)
         x = torch.tensor(features_df.values, dtype=torch.float)
         y = torch.tensor(labels_df['label'].values, dtype=torch.long)
         
