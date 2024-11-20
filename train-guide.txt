@@ -1,0 +1,14 @@
+#MLP
+python best_train.py --model mlp --hidden_channels 500 --learning_rate 0.006 --wd 0.003 --num_layers 3 --dropout 0.55
+
+#GCN
+python best_train.py --model gcn --hidden_channels 370 --learning_rate 0.0035 --wd 0.008 --num_layers 2 --dropout 0.6
+
+#GraphSAGE
+python best_train.py --model graphsage --hidden_channels 315 --learning_rate 0.0008 --wd 0.004 --num_layers 5 --dropout 0.57
+
+#GAT
+python best_train.py --model gat --hidden_channels 60 --learning_rate 0.002 --wd 0.002 --num_layers 3 --dropout 0.25 --heads 6
+
+#Use optuna to optimize hyperparameter
+python hp_optimizer --model gcn
