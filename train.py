@@ -60,14 +60,28 @@ def create_model(model_type, data, dataset, preprocess_mode='basic'):
     elif model_type == "gat":
         model_params = {
             'in_channels': data.x.size(1),
-            'hidden_channels': 32,
+            'hidden_channels': 64,
             'out_channels': dataset.num_classes,
             'num_layers': 3,
             'dropout': 0.5,
-            'heads': 8, # If OOM, change to 4
+            'heads': 2, 
             'preprocess_mode': preprocess_mode
         }
         return GAT(**model_params), model_params
+    
+    elif model_type == "gat_dgl":
+        model_params = {
+            'in_channels': data.x.size(1),
+            'hidden_channels': 64,
+            'out_channels': dataset.num_classes,
+            'num_layers': 3,
+            'dropout': 0.75,
+            'heads': 4,
+            'attn_drop': 0.05,
+            'norm': 'both',
+            'preprocess_mode': preprocess_mode
+        }
+        return GATAdapter(**model_params), model_params
     
     elif model_type == "sage":
         model_params = {
@@ -107,7 +121,7 @@ def train_and_evaluate(model, train_loader, val_loader, test_loader, model_type,
         ),
         EarlyStopping(
             monitor='val_acc',
-            patience=10,
+            patience=100,
             mode='max'
         ),
         CustomProgressBar()  # Add custom progress bar
@@ -115,7 +129,7 @@ def train_and_evaluate(model, train_loader, val_loader, test_loader, model_type,
     
     # Create trainer
     trainer = pl.Trainer(
-        max_epochs=500,
+        max_epochs=1000,
         accelerator='auto',
         devices=1,
         callbacks=callbacks,
@@ -228,11 +242,12 @@ def train_gnn_model(model_type='gcn', preprocess_mode='compare', embedding_type=
 
 if __name__ == '__main__':
     # Example usage:
-    train_gnn_model(model_type='mlp', embedding_type='word2vec')  # Run MLP baseline
+    # train_gnn_model(model_type='mlp', embedding_type='word2vec')  # Run MLP baseline
     # train_gnn_model(model_type='gcn', preprocess_mode='compare')  # Compare preprocessing methods
     # train_gnn_model(model_type='gat', preprocess_mode='basic')  # Use basic preprocessing
     # train_gnn_model(model_type='sage', preprocess_mode='arxiv')  # Use arxiv preprocessing
     
     # train_gnn_model(model_type='sage', preprocess_mode='compare', embedding_type='word2vec')
     # train_gnn_model(model_type='mlp', preprocess_mode='compare', embedding_type='word2vec')
+    train_gnn_model(model_type='gat_dgl', preprocess_mode='basic', embedding_type='word2vec') 
     

@@ -1,0 +1,24 @@
+{
+    "model_type": "gat_dgl",
+    "preprocess_mode": "basic",
+    "embedding_type": "scibert",
+    "model_configs": {
+        "gat_dgl_basic": {
+            "in_channels": 128,
+            "hidden_channels": 64,
+            "out_channels": 53,
+            "num_layers": 3,
+            "dropout": 0.75,
+            "heads": 4,
+            "attn_drop": 0.05,
+            "norm": "both",
+            "preprocess_mode": "basic"
+        }
+    },
+    "results": {
+        "gat_dgl_basic": {
+            "test_loss": 0.6990200877189636,
+            "test_acc": 0.7733598947525024
+        }
+    }
+}

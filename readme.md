@@ -47,7 +47,7 @@ from train import train_gnn_model
 
 # Train GCN with SciBERT embeddings
 results = train_gnn_model(
-    model_type='gcn',           # Options: 'mlp', 'gcn', 'gat', 'sage'
+    model_type='gcn',           # Options: 'mlp', 'gcn', 'gat', 'gat_dgl', 'sage'
     preprocess_mode='compare',  # Options: 'compare', 'basic', 'arxiv'
     embedding_type='scibert'    # Options: 'scibert', 'word2vec'
 )
@@ -77,3 +77,4 @@ Training results are automatically saved to:
 - PyTorch Lightning
 - pandas
 - numpy
+- dgl (for gat_dgl)

@@ -6,6 +6,8 @@ from torchmetrics import Accuracy
 from torch_geometric.nn import GCNConv
 from torch_geometric.nn import GATConv
 from torch_geometric.nn import SAGEConv
+import dgl
+from gat_dgl import GAT as DGLGATModel  # Add DGL version of GAT
 
 import torch
 import numpy as np
@@ -248,6 +250,31 @@ class GAT(GNNBase):
             x = self.dropout(x)
         x = self.convs[-1](x, edge_index)
         return F.log_softmax(x, dim=1)
+    
+class GATAdapter(GNNBase):
+    def __init__(self, in_channels, hidden_channels, out_channels, num_layers=2, 
+                 dropout=0.5, heads=4, attn_drop=0.05, norm='both', preprocess_mode='basic'):
+        super().__init__(in_channels, out_channels, dropout, preprocess_mode)
+        
+        self.model = DGLGATModel(
+            in_feats=in_channels,
+            n_classes=out_channels,
+            n_hidden=hidden_channels,
+            n_layers=num_layers,
+            n_heads=heads,
+            activation=F.elu,
+            dropout=dropout,
+            attn_drop=attn_drop,
+            norm=norm
+        )
+
+    def forward(self, x, edge_index):
+        edge_index, _ = self.preprocess_graph(edge_index)
+        g = dgl.graph((edge_index[0], edge_index[1]))
+        g = g.to(x.device)
+        
+        out = self.model(g, x)
+        return F.log_softmax(out, dim=1)
 
 
 class GraphSAGE(GNNBase):
