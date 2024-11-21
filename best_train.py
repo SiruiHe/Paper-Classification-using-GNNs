@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import torch
 from tuned_baseline import *
-from construct_dataset.create_dataset import CustomArxivDataset
+from dataset.create_dataset_best import CustomArxivDataset
 from torch_geometric.loader import DataLoader
 import gc
 import argparse
@@ -27,7 +27,7 @@ def main():
     gc.collect()
     pl.seed_everything(42)
 
-    dataset = CustomArxivDataset(root='construct_dataset/')
+    dataset = CustomArxivDataset(root='dataset/')
     #dataset.process()
     data = dataset[0]
     data = data.to(device)
