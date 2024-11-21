@@ -348,12 +348,12 @@ def train_gnn_model(model_type='gcn', preprocess_mode='compare', embedding_type=
 
 if __name__ == '__main__':
     # Example usage:
-    # train_gnn_model(model_type='mlp', embedding_type='word2vec')  # Run MLP baseline
-    train_gnn_model(model_type='gcn', preprocess_mode='basic')  # Compare preprocessing methods
+    # train_gnn_model(model_type='mlp', embedding_type='word2vec')  # Run MLP baseline with word2vec
+    # train_gnn_model(model_type='gcn', embedding_type='scibert')  # Run GCN with scibert
+    
+    # train_gnn_model(model_type='gcn', preprocess_mode='compare')  # Compare preprocessing methods
     # train_gnn_model(model_type='gat', preprocess_mode='basic')  # Use basic preprocessing
     # train_gnn_model(model_type='sage', preprocess_mode='arxiv')  # Use arxiv preprocessing
     
-    # train_gnn_model(model_type='sage', preprocess_mode='compare', embedding_type='word2vec')
-    # train_gnn_model(model_type='mlp', preprocess_mode='compare', embedding_type='word2vec')
-    # train_gnn_model(model_type='gat_dgl', preprocess_mode='basic', embedding_type='word2vec') 
+    train_gnn_model(model_type='gcn', preprocess_mode='basic', embedding_type='word2vec')
     
