@@ -1,4 +1,4 @@
-# CS5284 Graph Machine Learning Project
+#  Scientific Paper Classification using Graph Neural Networks 
 
 This project implements various GNN architectures for paper classification on a custom ogbn-arxiv-like dataset.
 
